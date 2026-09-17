@@ -1,3 +1,4 @@
+
 # Painel de Iniciação Científica - PROPP / UFOP (Leitura Direta de CSV)
 
 Painel interativo e responsivo desenvolvido para a seção de Iniciação Científica (IC) da **Pró-Reitoria de Pesquisa e Pós-Graduação (PROPP/UFOP)**, inspirado no layout analítico do Power BI da UFOP.
@@ -53,3 +54,7 @@ Acesse no navegador: [http://localhost:8000](http://localhost:8000)
 ## 🌐 Como Atualizar a Base de Dados no Futuro
 
 Basta exportar a nova versão da planilha em formato `.csv` (separado por vírgulas e codificação UTF-8) com o nome `dados-IC-propp.csv` e substituí-la na pasta do projeto. O painel web refletirá automaticamente os novos dados a cada recarregamento da página.
+
+# PIC_PROPP_UFOP
+Programas de Iniciação Científica e Tecnológica - Panorama Institucional de Projetos, Departamentos e Bolsistas
+
