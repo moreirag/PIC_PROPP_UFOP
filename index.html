@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROPP/UFOP - Painel dos Programas de Iniciação Científica</title>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- PapaParse (para leitura direta e veloz do CSV) & Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Início do Container da Seção PROPP (Pode ser incorporado ao portal da PROPP) -->
+  <section class="propp-ic-dashboard-section" id="painel-ic-propp">
+    
+    <!-- Header Institucional da Seção -->
+    <header class="dash-header">
+      <div class="dash-header-left">
+        <div class="dash-badge">PROPP • UFOP</div>
+        <h2>Programas de Iniciação Científica e Tecnológica</h2>
+        <p class="subtitle">Panorama Institucional de Projetos, Departamentos e Bolsistas</p>
+      </div>
+      <div class="dash-header-right">
+        <button id="btn-reset-filters" class="btn btn-outline" title="Redefinir filtros">
+          <i class="fa-solid fa-arrow-rotate-left"></i> Limpar Filtros
+        </button>
+        <span class="last-update" id="data-source-info"><i class="fa-solid fa-file-csv"></i> Fonte: dados-IC-propp.csv</span>
+      </div>
+    </header>
+
+    <!-- Barra de Filtros Estilo Power BI -->
+    <div class="filter-toolbar">
+      <div class="filter-group">
+        <label for="filter-area"><i class="fa-solid fa-layer-group"></i> Grande Área:</label>
+        <select id="filter-area" class="form-select">
+          <option value="ALL">Todas as Grandes Áreas</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-programa"><i class="fa-solid fa-award"></i> Programa:</label>
+        <select id="filter-programa" class="form-select">
+          <option value="ALL">Todos os Programas</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-setor"><i class="fa-solid fa-building-columns"></i> Setor / Departamento:</label>
+        <select id="filter-setor" class="form-select">
+          <option value="ALL">Todos os Departamentos</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filter-situacao"><i class="fa-solid fa-circle-check"></i> Situação:</label>
+        <select id="filter-situacao" class="form-select">
+          <option value="ALL">Todas as Situações</option>
+        </select>
+      </div>
+
+      <!-- Filtro condicional caso a coluna ANO exista no CSV -->
+      <div class="filter-group" id="filter-ano-group" style="display: none;">
+        <label for="filter-ano"><i class="fa-regular fa-calendar"></i> Ano:</label>
+        <select id="filter-ano" class="form-select">
+          <option value="ALL">Todos os Anos</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Cards de Indicadores (KPIs) -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-primary">
+        <div class="kpi-icon"><i class="fa-solid fa-microscope"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-title">Total de Bolsas / Projetos</span>
+          <span class="kpi-value" id="kpi-total">0</span>
+          <span class="kpi-sub" id="kpi-total-sub">Processando CSV...</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon icon-success"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-title">Projetos Concluídos</span>
+          <span class="kpi-value" id="kpi-concluidos">0</span>
+          <span class="kpi-sub" id="kpi-concluidos-taxa">0% do total</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon icon-active"><i class="fa-solid fa-spinner"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-title">Projetos Ativos</span>
+          <span class="kpi-value" id="kpi-ativos">0</span>
+          <span class="kpi-sub" id="kpi-ativos-taxa">0% em andamento</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon icon-amber"><i class="fa-solid fa-building-columns"></i></div>
+        <div class="kpi-content">
+          <span class="kpi-title">Departamentos / Setores</span>
+          <span class="kpi-value" id="kpi-setores">0</span>
+          <span class="kpi-sub">Setores acadêmicos UFOP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Visualizações Gráficas -->
+    <div class="charts-grid">
+      
+      <!-- Gráfico 1: Departamentos com Mais Projetos -->
+      <div class="chart-box col-span-2" id="box-chart-setor">
+        <div class="chart-header">
+          <h3><i class="fa-solid fa-chart-bar"></i> Distribuição por Departamento / Setor (Top 12)</h3>
+          <span class="chart-badge">Setores UFOP</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="chartSetor"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 2: Distribuição por Grande Área -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <h3><i class="fa-solid fa-chart-pie"></i> Distribuição por Grande Área</h3>
+          <span class="chart-badge">CNPq</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="chartAreas"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 3: Projetos por Programa de IC -->
+      <div class="chart-box">
+        <div class="chart-header">
+          <h3><i class="fa-solid fa-diagram-project"></i> Participação por Programa</h3>
+          <span class="chart-badge">Modalidades IC</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="chartProgramas"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 4: Status dos Projetos -->
+      <div class="chart-box col-span-2">
+        <div class="chart-header">
+          <h3><i class="fa-solid fa-list-check"></i> Situação Atual dos Projetos</h3>
+          <span class="chart-badge">Status</span>
+        </div>
+        <div class="chart-wrapper" style="height: 220px;">
+          <canvas id="chartSituacao"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tabela Resumo com Busca Dinâmica -->
+    <div class="table-container">
+      <div class="table-header">
+        <h3><i class="fa-solid fa-table"></i> Registros de Iniciação Científica</h3>
+        <input type="text" id="table-search" class="search-input" placeholder="Buscar por curso, setor, área ou modalidade...">
+      </div>
+      <div class="table-responsive">
+        <table class="dash-table" id="tabela-dados">
+          <thead>
+            <tr>
+              <th>Programa</th>
+              <th>Setor</th>
+              <th>Grande Área CNPq</th>
+              <th>Área CNPq</th>
+              <th>Situação Atual</th>
+              <th>Curso do Bolsista</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            <!-- Injetado dinamicamente via JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span id="table-count-info">Carregando dados do arquivo CSV...</span>
+      </div>
+    </div>
+
+  </section>
+  <!-- Fim do Container da Seção PROPP -->
+
+  <script src="js/app.js"></script>
+</body>
+</html>
