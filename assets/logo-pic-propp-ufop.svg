@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 104" role="img" aria-labelledby="title desc">
+  <title id="title">PIC PROPP UFOP</title>
+  <desc id="desc">Identidade visual do painel de Iniciação Científica, com livro aberto e símbolo científico em vinho institucional.</desc>
+  <rect width="104" height="104" rx="18" fill="#851c24"/>
+  <path d="M20 31c12-5 23-2 32 5v42c-9-7-20-10-32-5z" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M84 31c-12-5-23-2-32 5v42c9-7 20-10 32-5z" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M52 36v42" stroke="#fff" stroke-width="3"/>
+  <ellipse cx="52" cy="23" rx="19" ry="7" fill="none" stroke="#f0c66a" stroke-width="2" transform="rotate(-28 52 23)"/>
+  <ellipse cx="52" cy="23" rx="19" ry="7" fill="none" stroke="#f0c66a" stroke-width="2" transform="rotate(28 52 23)"/>
+  <circle cx="52" cy="23" r="3.5" fill="#f0c66a"/>
+  <text x="124" y="43" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="700" letter-spacing="2" fill="#851c24">PROPP · UFOP</text>
+  <text x="124" y="71" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#172033">Iniciação Científica</text>
+  <text x="124" y="91" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="1.4" fill="#64748b">PAINEL INSTITUCIONAL</text>
+</svg>
