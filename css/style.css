@@ -40,6 +40,31 @@ body {
   gap: 20px;
 }
 
+/* Identidade visual do painel */
+.dash-header-left {
+  min-width: 0;
+  flex: 1 1 560px;
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.brand-lockup:focus-visible {
+  outline: 3px solid var(--ufop-accent);
+  outline-offset: 4px;
+}
+
+.brand-logo {
+  display: block;
+  width: min(100%, 360px);
+  height: auto;
+}
+
 /* Header */
 .dash-header {
   background: var(--card-bg);
@@ -417,4 +442,33 @@ body {
   font-size: 0.8rem;
   color: var(--text-muted);
   border-top: 1px solid var(--border-color);
+}
+
+
+/* Ajustes para telas pequenas */
+@media (max-width: 600px) {
+  body {
+    padding: 12px 10px;
+  }
+
+  .dash-header {
+    padding: 18px;
+  }
+
+  .brand-logo {
+    width: min(100%, 320px);
+  }
+
+  .dash-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .dash-header-right {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .search-input {
+    width: 100%;
+  }
 }
