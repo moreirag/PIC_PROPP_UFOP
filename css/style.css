@@ -600,3 +600,18 @@ body {
   html { scroll-behavior: auto; }
   .kpi-card, .btn, .form-select { transition: none; }
 }
+
+
+/* Interatividade dos filtros e paginação */
+.active-filters { display:flex; align-items:center; flex-wrap:wrap; gap:8px; min-height:38px; margin-top:-8px; }
+.active-filters-label { font-size:.79rem; font-weight:700; color:#526177; }
+.no-active-filters { font-size:.8rem; color:#667286; }
+.filter-chip { font:inherit; font-size:.78rem; cursor:pointer; border:1px solid #e4c8cc; color:#851c24; background:#fff3f4; padding:6px 10px; border-radius:20px; }
+.filter-chip:hover { background:#fbe0e3; }
+.filter-chip:focus-visible { outline:3px solid #c59b27; outline-offset:2px; }
+.table-pagination { display:flex; justify-content:flex-end; align-items:center; gap:12px; padding:12px 20px; border-top:1px solid #e4e8f0; }
+.table-pagination span { font-size:.8rem; color:#526177; font-variant-numeric:tabular-nums; }
+.table-pagination .btn { padding:7px 12px; }
+.table-pagination .btn:disabled { opacity:.4; cursor:not-allowed; }
+.chart-wrapper canvas { touch-action:pan-y; }
+@media (max-width:600px) { .table-pagination { justify-content:center; gap:8px; } }
