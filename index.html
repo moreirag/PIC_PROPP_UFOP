@@ -86,6 +86,8 @@
 
     <div class="section-heading"><div><span class="section-kicker">VISÃO GERAL</span><h2>Indicadores principais</h2><p>Resumo do recorte selecionado nos filtros.</p></div></div>
 
+    <div class="active-filters" id="active-filters" aria-live="polite"><span class="active-filters-label">Filtros ativos:</span><span class="no-active-filters">Nenhum — exibindo todos os registros</span></div>
+
     <!-- Cards de Indicadores (KPIs) -->
     <div class="kpi-grid">
       <div class="kpi-card kpi-primary">
@@ -201,6 +203,11 @@
             <!-- Injetado dinamicamente via JS -->
           </tbody>
         </table>
+      </div>
+      <div class="table-pagination" id="table-pagination" aria-label="Navegação da tabela">
+        <button type="button" class="btn btn-outline" id="table-prev" aria-label="Página anterior">Anterior</button>
+        <span id="table-page-info" aria-live="polite">Página 1</span>
+        <button type="button" class="btn btn-outline" id="table-next" aria-label="Próxima página">Próxima</button>
       </div>
       <div class="table-footer">
         <span id="table-count-info">Carregando dados do arquivo CSV...</span>
