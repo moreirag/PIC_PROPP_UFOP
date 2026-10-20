@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let rawData = [];
   let filteredData = [];
   let hasAnoColumn = false;
+  let currentPage = 1;
+  const pageSize = 100;
 
   // Instâncias dos gráficos Chart.js
   let chartSetorInstance = null;
@@ -22,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const tableBody = document.getElementById('table-body');
   const tableInfo = document.getElementById('table-count-info');
   const dataSourceInfo = document.getElementById('data-source-info');
+  const activeFilters = document.getElementById('active-filters');
+  const pagePrev = document.getElementById('table-prev');
+  const pageNext = document.getElementById('table-next');
+  const pageInfo = document.getElementById('table-page-info');
 
   // KPIs
   const kpiTotal = document.getElementById('kpi-total');
@@ -144,7 +150,15 @@ document.addEventListener('DOMContentLoaded', () => {
     selectPrograma.addEventListener('change', aplicarFiltros);
     selectSetor.addEventListener('change', aplicarFiltros);
     selectSituacao.addEventListener('change', aplicarFiltros);
-    searchInput.addEventListener('input', () => renderTabela(filtrarTabelaPorBusca()));
+    searchInput.addEventListener('input', () => { currentPage = 1; renderTabela(filtrarTabelaPorBusca()); });
+    pagePrev.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTabela(filtrarTabelaPorBusca()); } });
+    pageNext.addEventListener('click', () => { const pages = Math.max(1, Math.ceil(filtrarTabelaPorBusca().length / pageSize)); if (currentPage < pages) { currentPage++; renderTabela(filtrarTabelaPorBusca()); } });
+    activeFilters.addEventListener('click', event => {
+      const button = event.target.closest('button[data-filter-id]');
+      if (!button) return;
+      const select = document.getElementById(button.dataset.filterId);
+      if (select) { select.value = 'ALL'; aplicarFiltros(); }
+    });
 
     btnReset.addEventListener('click', () => {
       selectArea.value = 'ALL';
@@ -183,9 +197,57 @@ document.addEventListener('DOMContentLoaded', () => {
       return matchArea && matchProg && matchSetor && matchSit && matchAno;
     });
 
+    currentPage = 1;
+    atualizarFiltrosAtivos();
     atualizarKPIs(filteredData);
     atualizarGraficos(filteredData);
     renderTabela(filtrarTabelaPorBusca());
+  }
+
+
+  // Resumo interativo dos filtros e navegação por cliques nos gráficos.
+  function atualizarFiltrosAtivos() {
+    activeFilters.replaceChildren();
+    const label = document.createElement('span');
+    label.className = 'active-filters-label';
+    label.textContent = 'Filtros ativos:';
+    activeFilters.appendChild(label);
+    const selections = [
+      ['filter-area', selectArea, 'Área'],
+      ['filter-programa', selectPrograma, 'Programa'],
+      ['filter-setor', selectSetor, 'Setor'],
+      ['filter-situacao', selectSituacao, 'Situação'],
+      ['filter-ano', hasAnoColumn ? selectAno : null, 'Ano']
+    ].filter(([,select]) => select && select.value !== 'ALL');
+    if (!selections.length) {
+      const empty = document.createElement('span');
+      empty.className = 'no-active-filters';
+      empty.textContent = 'Nenhum — exibindo todos os registros';
+      activeFilters.appendChild(empty);
+    }
+    selections.forEach(([id, select, title]) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'filter-chip';
+      chip.dataset.filterId = id;
+      chip.textContent = title + ': ' + select.value + ' ×';
+      chip.setAttribute('aria-label', 'Remover filtro ' + title + ': ' + select.value);
+      activeFilters.appendChild(chip);
+    });
+    activeFilters.setAttribute('aria-label', selections.length + ' filtros ativos');
+  }
+
+  function ativarFiltroGrafico(chart, event, select, labels) {
+    const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+    if (!points.length) return;
+    const label = labels[points[0].index];
+    if (!label || !Array.from(select.options).some(opt => opt.value === label)) return;
+    select.value = select.value === label ? 'ALL' : label;
+    aplicarFiltros();
+  }
+
+  function chartClick(select, labels) {
+    return (event, _elements, chart) => ativarFiltroGrafico(chart, event, select, labels);
   }
 
   // Atualização dos Indicadores de Topo
@@ -248,6 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        onClick: chartClick(selectSetor, labels),
+        onHover: (event, elements, chart) => { chart.canvas.style.cursor = elements.length ? 'pointer' : 'default'; },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -292,6 +356,8 @@ document.addEventListener('DOMContentLoaded', () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        onClick: chartClick(selectArea, labels),
+        onHover: (event, elements, chart) => { chart.canvas.style.cursor = elements.length ? 'pointer' : 'default'; },
         plugins: {
           legend: {
             position: 'right',
@@ -332,6 +398,8 @@ document.addEventListener('DOMContentLoaded', () => {
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
+        onClick: chartClick(selectPrograma, labels),
+        onHover: (event, elements, chart) => { chart.canvas.style.cursor = elements.length ? 'pointer' : 'default'; },
         plugins: {
           legend: { display: false }
         },
@@ -385,6 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        onClick: chartClick(selectSituacao, labels),
+        onHover: (event, elements, chart) => { chart.canvas.style.cursor = elements.length ? 'pointer' : 'default'; },
         plugins: {
           legend: { display: false }
         },
@@ -413,7 +483,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Renderização da Tabela
   function renderTabela(data) {
     tableBody.innerHTML = '';
-    const slice = data.slice(0, 100);
+    const pages = Math.max(1, Math.ceil(data.length / pageSize));
+    currentPage = Math.min(currentPage, pages);
+    const start = (currentPage - 1) * pageSize;
+    const slice = data.slice(start, start + pageSize);
+    pagePrev.disabled = currentPage <= 1;
+    pageNext.disabled = currentPage >= pages;
+    pageInfo.textContent = `Página ${currentPage} de ${pages}`;
 
     slice.forEach(row => {
       const tr = document.createElement('tr');
@@ -423,18 +499,24 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (row.situacao === 'ATIVO') badgeClass = 'status-ativo';
       else if (row.situacao === 'CANCELADO') badgeClass = 'status-cancelado';
 
-      tr.innerHTML = `
-        <td><strong>${row.programa}</strong></td>
-        <td><span class="badge-dept">${row.setor}</span></td>
-        <td>${row.grandeArea}</td>
-        <td>${row.areaCnpq}</td>
-        <td><span class="badge-status ${badgeClass}">${row.situacao}</span></td>
-        <td class="text-curso" title="${row.curso}">${row.curso}</td>
-      `;
+      [row.programa, row.setor, row.grandeArea, row.areaCnpq, row.situacao, row.curso].forEach((value, index) => {
+        const td = document.createElement('td');
+        if (index === 0 || index === 1 || index === 4) {
+          const span = document.createElement(index === 0 ? 'strong' : 'span');
+          if (index === 1) span.className = 'badge-dept';
+          if (index === 4) span.className = 'badge-status ' + badgeClass;
+          span.textContent = value;
+          td.appendChild(span);
+        } else {
+          td.textContent = value;
+        }
+        if (index === 5) { td.className = 'text-curso'; td.title = value; }
+        tr.appendChild(td);
+      });
       tableBody.appendChild(tr);
     });
 
-    tableInfo.textContent = `Exibindo ${slice.length} de ${data.length.toLocaleString('pt-BR')} registros filtrados (Total da base: ${rawData.length.toLocaleString('pt-BR')})`;
+    tableInfo.textContent = `Exibindo ${data.length ? start + 1 : 0}–${start + slice.length} de ${data.length.toLocaleString('pt-BR')} registros filtrados (Total da base: ${rawData.length.toLocaleString('pt-BR')})`;
   }
 
   // Iniciar leitura do CSV
