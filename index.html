@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#851c24">
+  <meta name="description" content="Painel de indicadores dos Programas de Iniciação Científica e Tecnológica da PROPP/UFOP.">
   <title>PROPP/UFOP - Painel dos Programas de Iniciação Científica</title>
   <!-- Google Fonts & FontAwesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,15 +21,18 @@
 <body>
 
   <!-- Início do Container da Seção PROPP (Pode ser incorporado ao portal da PROPP) -->
-  <section class="propp-ic-dashboard-section" id="painel-ic-propp">
+  <main class="propp-ic-dashboard-section" id="painel-ic-propp">
     
+    <div class="institutional-ribbon"><span><i class="fa-solid fa-building-columns" aria-hidden="true"></i> Universidade Federal de Ouro Preto</span><span>Pesquisa • Inovação • Formação científica</span></div>
+
     <!-- Header Institucional da Seção -->
     <header class="dash-header">
       <div class="dash-header-left">
         <a class="brand-lockup" href="#painel-ic-propp" aria-label="Painel de Iniciação Científica PROPP UFOP">
           <img class="brand-logo" src="assets/logo-pic-propp-ufop.svg" alt="PROPP UFOP — Iniciação Científica">
         </a>
-        <h2>Programas de Iniciação Científica e Tecnológica</h2>
+        <span class="section-eyebrow"><span class="eyebrow-dot"></span> PAINEL DE INDICADORES</span>
+        <h1>Programas de Iniciação Científica e Tecnológica</h1>
         <p class="subtitle">Panorama Institucional de Projetos, Departamentos e Bolsistas</p>
       </div>
       <div class="dash-header-right">
@@ -37,6 +42,8 @@
         <span class="last-update" id="data-source-info"><i class="fa-solid fa-file-csv"></i> Fonte: dados-IC-propp.csv</span>
       </div>
     </header>
+
+    <div class="section-heading filters-heading"><div><span class="section-kicker">EXPLORAR DADOS</span><h2>Filtros do painel</h2><p>Selecione os critérios para atualizar os indicadores e gráficos.</p></div><span class="section-heading-icon" aria-hidden="true"><i class="fa-solid fa-sliders"></i></span></div>
 
     <!-- Barra de Filtros Estilo Power BI -->
     <div class="filter-toolbar">
@@ -77,6 +84,8 @@
       </div>
     </div>
 
+    <div class="section-heading"><div><span class="section-kicker">VISÃO GERAL</span><h2>Indicadores principais</h2><p>Resumo do recorte selecionado nos filtros.</p></div></div>
+
     <!-- Cards de Indicadores (KPIs) -->
     <div class="kpi-grid">
       <div class="kpi-card kpi-primary">
@@ -115,6 +124,8 @@
         </div>
       </div>
     </div>
+
+    <div class="section-heading"><div><span class="section-kicker">ANÁLISE INSTITUCIONAL</span><h2>Distribuição dos projetos</h2><p>Explore a participação por setor, área, programa e situação.</p></div></div>
 
     <!-- Seção de Visualizações Gráficas -->
     <div class="charts-grid">
@@ -165,13 +176,16 @@
 
     </div>
 
+    <div class="section-heading"><div><span class="section-kicker">CONSULTA DETALHADA</span><h2>Registros da base</h2><p>Consulte os dados correspondentes aos filtros aplicados.</p></div></div>
+
     <!-- Tabela Resumo com Busca Dinâmica -->
     <div class="table-container">
       <div class="table-header">
         <h3><i class="fa-solid fa-table"></i> Registros de Iniciação Científica</h3>
-        <input type="text" id="table-search" class="search-input" placeholder="Buscar por curso, setor, área ou modalidade...">
+        <label class="sr-only" for="table-search">Buscar registros por curso, setor, área ou modalidade</label>
+        <input type="search" id="table-search" class="search-input" placeholder="Buscar por curso, setor, área ou modalidade..." aria-label="Buscar registros">
       </div>
-      <div class="table-responsive">
+      <div class="table-responsive" tabindex="0" role="region" aria-label="Tabela de registros de iniciação científica">
         <table class="dash-table" id="tabela-dados">
           <thead>
             <tr>
@@ -193,7 +207,8 @@
       </div>
     </div>
 
-  </section>
+    <footer class="dash-footer"><span>PROPP / UFOP <span aria-hidden="true">·</span> Painel de Iniciação Científica e Tecnológica</span><span>Os indicadores refletem os registros da base de dados carregada.</span></footer>
+  </main>
   <!-- Fim do Container da Seção PROPP -->
 
   <script src="js/app.js"></script>
